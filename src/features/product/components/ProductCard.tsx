@@ -1,25 +1,35 @@
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 
 import { toRupiah } from "@/utils/toRupiah";
+import { ProductCardProps } from "@/types/product.types";
 
-export type ProductCardProps = {
-  imageUrl: string;
-  name: string;
-  category: string;
-  price: number;
-};
-
-const ProductCard = ({ imageUrl, name, category, price }: ProductCardProps) => {
+const ProductCard = ({
+  id,
+  image,
+  name,
+  category,
+  price,
+}: ProductCardProps) => {
   return (
-    <article className="flex flex-col">
-      <Image src={imageUrl} alt={name} width={1280} height={720} />
+    <Link
+      className="flex w-full flex-col border border-black"
+      href={`/products/${id}`}
+    >
+      <Image
+        src={image}
+        alt={name}
+        width={180}
+        height={120}
+        className="object-cover"
+      />
       <div className="flex flex-col">
-        <h3>{name}</h3>
+        <h3 className="text-red-700">{name}</h3>
         <p>{category}</p>
         <p>{toRupiah(price)}</p>
       </div>
-    </article>
+    </Link>
   );
 };
 
