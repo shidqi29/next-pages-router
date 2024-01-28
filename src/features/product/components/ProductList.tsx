@@ -1,16 +1,7 @@
 import React from "react";
 
 import ProductCard from "./ProductCard";
-
-export type ProductListProps = {
-  data: {
-    id: number;
-    image: string;
-    name: string;
-    category: string;
-    price: number;
-  }[];
-};
+import { ProductListProps } from "@/types/product.types";
 
 const ProductList = ({ data: products }: ProductListProps) => {
   if (!products) return null;
@@ -18,7 +9,8 @@ const ProductList = ({ data: products }: ProductListProps) => {
   return products.map((product) => (
     <ProductCard
       key={product.id}
-      imageUrl={product.image}
+      id={product.id}
+      image={product.image}
       category={product.category}
       name={product.name}
       price={product.price}

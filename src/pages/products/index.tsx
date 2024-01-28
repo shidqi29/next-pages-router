@@ -1,4 +1,3 @@
-
 import ProductSection from "@/features/product/components/ProductSection";
 import React from "react";
 

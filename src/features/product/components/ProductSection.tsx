@@ -11,7 +11,7 @@ const ProductSection = () => {
   if (error) return <p>{error.message}</p>;
 
   return (
-    <div className="grid w-full grid-cols-3 gap-8">
+    <div className="flex w-full flex-wrap gap-x-10">
       <ProductList data={data.data} />
     </div>
   );
