@@ -2,4 +2,3 @@ export * from "./api";
 export * from "./components/ProductCard";
 export * from "./components/ProductList";
 export * from "./components/ProductSection";
-export * from "./components/ProductServerSection";
