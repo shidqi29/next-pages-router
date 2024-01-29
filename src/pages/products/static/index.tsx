@@ -28,5 +28,6 @@ export async function getStaticProps() {
     props: {
       products: data.data,
     },
+    revalidate: 10, // revalidate every 10 seconds (incremental static regeneration)
   };
 }
