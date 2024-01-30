@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import withAuth from "./middlewares/withAuth";
 
 // This function can be marked `async` if using `await` inside
-export function middleware(request: NextRequest) {
-  return NextResponse.redirect(new URL("/auth/login", request.url));
+export function mainMiddleware(request: NextRequest) {
+  const res = NextResponse.next();
+
+  return res;
 }
 
-// See "Matching Paths" below to learn more
-export const config = {
-  matcher: ["/products", "/products/:path*"],
-};
+const requireAuth = ["/profile"];
+
+export default withAuth(mainMiddleware, requireAuth);
