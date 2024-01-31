@@ -1,13 +1,86 @@
+import { signIn } from "next-auth/react";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  /**
+   * Handles the form submission for the registration page.
+   * @param e - The form event.
+   */
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    // Get the callback URL from the query parameters.
+    const callbackUrl: any = router.query.callbackUrl || "/";
+
+    // Sign in the user.
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: e.currentTarget.email.value,
+        password: e.currentTarget.password.value,
+        callbackUrl,
+      });
+
+      if (res?.error) {
+        setIsLoading(false);
+        setError("*email or password is incorrect");
+      } else {
+        setIsLoading(false);
+        router.push(callbackUrl);
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      setError("*email or password is incorrect");
+    }
+  };
+
   return (
-    <div>
-      <h1>Login Page</h1>
-      <p>
-        Register <Link href="/auth/register">disini</Link>
-      </p>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-y-6">
+      <h1 className="text-2xl font-bold">Login Page</h1>
+      <div className="flex w-full max-w-sm flex-col gap-y-4 rounded-xl p-6 shadow-lg shadow-black">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-y-2">
+          <label htmlFor="email">Email</label>
+          <input
+            required
+            type="email"
+            name="email"
+            id="email"
+            placeholder="email"
+            className="rounded-md border border-slate-400 p-2"
+          />
+          <label htmlFor="password">Password</label>
+          <input
+            required
+            type="password"
+            name="password"
+            id="password"
+            placeholder="password"
+            className="rounded border border-slate-400 p-2"
+          />
+          {error && <p className="text-red-500">{error}</p>}
+          <button
+            type="submit"
+            className="mt-2 rounded-md bg-black px-4 py-2 text-white"
+          >
+            {isLoading ? "Loading..." : "Login"}
+          </button>
+        </form>
+        <p className="self-center">
+          {"Don't have an account? "}
+          <Link href="/auth/register" className="font-semibold text-blue-600">
+            Sign Up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

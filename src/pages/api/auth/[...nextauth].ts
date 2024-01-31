@@ -1,5 +1,8 @@
 import nextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
+
+import { signIn } from "@/lib/firebase/service";
 
 /**
  * Configuration options for authentication in NextAuth.
@@ -40,30 +43,48 @@ export const authOptions: NextAuthOptions = {
           email: string;
           password: string;
         };
-
-        const user = { id: "1", email, password };
+        const user: any = await signIn({ email });
 
         // If no error and we have user data, return it
         if (user) {
-          return user;
+          // Check if password is valid
+          const isPasswordValid = await bcrypt.compare(password, user.password);
+          return isPasswordValid ? user : null;
         }
-        // Return null if user data could not be retrieved
+        // Return null if user data could not be retrieved or password is invalid
         return null;
       },
     }),
   ],
 
+  // pages object for customizing routes
+  pages: {
+    signIn: "/auth/login",
+  },
+
   callbacks: {
-    jwt({ token, user, account, profile }) {
+    jwt({ token, user, account, profile }: any) {
+      // check if user is signed in
       if (account?.provider === "credentials") {
         token.email = user.email;
+        token.username = user.username;
+        token.role = user.role;
       }
+      // return the token
       return token;
     },
+    // session is the object that is returned to the client
     async session({ session, token }: any) {
       if ("email" in token) {
         session.user.email = token.email;
       }
+      if ("username" in token) {
+        session.user.username = token.username;
+      }
+      if ("role" in token) {
+        session.user.role = token.role;
+      }
+      // return the session
       return session;
     },
   },

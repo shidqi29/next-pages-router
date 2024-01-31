@@ -8,8 +8,9 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import bcrypt from "bcrypt";
+
 import app from "./init";
-import { hash } from "hasha";
 import { userDataType } from "@/types/user.types";
 
 const firestore = getFirestore(app);
@@ -40,13 +41,32 @@ export async function retrieveDataById(collectionName: string, id: string) {
 }
 
 /**
+ * Sign in a user with the provided email.
+ * @param userData - The user data containing the email.
+ * @returns The user data if found, otherwise null.
+ */
+export async function signIn(userData: { email: string }) {
+  const q = query(
+    collection(firestore, "users"),
+    where("email", "==", userData.email),
+  );
+  const snapshot = await getDocs(q);
+  const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+  if (data.length > 0) {
+    return data[0];
+  } else {
+    return null;
+  }
+}
+
+/**
  * Sign up a user with the provided user data.
  *
  * @param userData - The user data to sign up with.
  * @param callback - The callback function to handle the sign up result.
  * @returns {Promise<void>} - A promise that resolves when the sign up process is complete.
  */
-
 export async function signUp(
   userData: userDataType,
   callback: Function,
@@ -63,7 +83,7 @@ export async function signUp(
     callback({ status: false, message: "Email already exists" });
   } else {
     // Create new user
-    userData.password = await hash(userData.password); // Hash password
+    userData.password = await bcrypt.hash(userData.password, 10); // Hash password
     userData.role = "user";
     await addDoc(collection(firestore, "users"), userData)
       .then(() => {

@@ -9,6 +9,6 @@ export function mainMiddleware(request: NextRequest) {
   return res;
 }
 
-const requireAuth = ["/profile"];
+const requireAuth = ["/profile", "/admin"];
 
 export default withAuth(mainMiddleware, requireAuth);
