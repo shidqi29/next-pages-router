@@ -5,8 +5,6 @@ import React from "react";
 const Navbar = () => {
   const session = useSession();
 
-  console.log(session);
-
   const navItems = [
     {
       label: "Home",
@@ -30,21 +28,26 @@ const Navbar = () => {
             </li>
           ))}
         </ul>
-        {session.status === "authenticated" ? (
-          <button
-            className="rounded-md border px-4 py-1"
-            onClick={() => signOut()}
-          >
-            Logout
-          </button>
-        ) : (
-          <button
-            className="rounded-md border px-4 py-1"
-            onClick={() => signIn()}
-          >
-            Login
-          </button>
-        )}
+        <div className="flex items-center gap-x-4">
+          {session.data?.user && (
+            <p>{(session.data.user as { username?: string }).username}</p>
+          )}
+          {session.status === "authenticated" ? (
+            <button
+              className="rounded-md border px-4 py-1"
+              onClick={() => signOut()}
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              className="rounded-md border px-4 py-1"
+              onClick={() => signIn()}
+            >
+              Login
+            </button>
+          )}
+        </div>
       </nav>
     </header>
   );
