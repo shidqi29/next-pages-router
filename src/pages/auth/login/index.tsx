@@ -9,6 +9,9 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Get the callback URL from the query parameters.
+  const callbackUrl: any = router.query.callbackUrl || "/";
+
   /**
    * Handles the form submission for the registration page.
    * @param e - The form event.
@@ -17,9 +20,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
-    // Get the callback URL from the query parameters.
-    const callbackUrl: any = router.query.callbackUrl || "/";
 
     // Sign in the user.
     try {
@@ -74,6 +74,19 @@ export default function LoginPage() {
             {isLoading ? "Loading..." : "Login"}
           </button>
         </form>
+        <div className="flex w-full items-center justify-center">
+          <button
+            onClick={() =>
+              signIn("google", {
+                callbackUrl,
+                redirect: false,
+              })
+            }
+            className="flex w-full items-center justify-center gap-x-2 rounded-md border border-black px-4 py-2 text-black"
+          >
+            Sign in with Google
+          </button>
+        </div>
         <p className="self-center">
           {"Don't have an account? "}
           <Link href="/auth/register" className="font-semibold text-blue-600">

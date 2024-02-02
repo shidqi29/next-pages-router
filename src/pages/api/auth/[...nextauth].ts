@@ -1,8 +1,9 @@
 import nextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
 
-import { signIn } from "@/lib/firebase/service";
+import { signIn, signInWithGoogle } from "@/lib/firebase/service";
 
 /**
  * Configuration options for authentication in NextAuth.
@@ -55,6 +56,10 @@ export const authOptions: NextAuthOptions = {
         return null;
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_OAUTH_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || "",
+    }),
   ],
 
   // pages object for customizing routes
@@ -63,12 +68,32 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    jwt({ token, user, account, profile }: any) {
-      // check if user is signed in
+    async jwt({ token, user, account, profile }: any) {
+      // check if user is signed in using credentials
       if (account?.provider === "credentials") {
         token.email = user.email;
         token.username = user.username;
         token.role = user.role;
+      }
+      // check if user is signed in using google
+      if (account?.provider === "google") {
+        const data = {
+          username: user.name,
+          email: user.email,
+          image: user.image,
+          type: "google",
+        };
+
+        await signInWithGoogle(data, (res: any) => {
+          if (res.status) {
+            token.email = res.data.email;
+            token.username = res.data.username;
+            token.image = res.data.image;
+            token.type = res.data.type;
+          } else {
+            console.error(res.message);
+          }
+        });
       }
       // return the token
       return token;
@@ -80,6 +105,9 @@ export const authOptions: NextAuthOptions = {
       }
       if ("username" in token) {
         session.user.username = token.username;
+      }
+      if ("image" in token) {
+        session.user.image = token.image;
       }
       if ("role" in token) {
         session.user.role = token.role;

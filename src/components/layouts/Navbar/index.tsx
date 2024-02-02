@@ -1,4 +1,5 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -30,7 +31,18 @@ const Navbar = () => {
         </ul>
         <div className="flex items-center gap-x-4">
           {session.data?.user && (
-            <p>{(session.data.user as { username?: string }).username}</p>
+            <div className="flex items-center gap-x-2">
+              <Image
+                src={session.data.user.image ?? ""}
+                alt={
+                  (session.data.user as { username?: string }).username ?? ""
+                }
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <p>{(session.data.user as { username?: string }).username}</p>
+            </div>
           )}
           {session.status === "authenticated" ? (
             <button
