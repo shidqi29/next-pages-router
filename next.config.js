@@ -6,6 +6,9 @@ const nextConfig = {
       {
         hostname: "static.nike.com",
       },
+      {
+        hostname: "lh3.googleusercontent.com",
+      },
     ],
   },
 };
